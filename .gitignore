@@ -2,6 +2,6 @@ lib/*
 out/*
 logs/*
 .idea/*
-MybatisStudy.iml
+SpringMVC.iml
 test/test.iml
 src/*.properties

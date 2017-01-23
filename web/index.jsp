@@ -7,7 +7,6 @@
     <title>mytitle</title>
   </head>
   <body>
-      aaaabbb
-  dddddbbb
+      aaaabbbdddd
   </body>
 </html>
