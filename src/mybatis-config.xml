@@ -3,32 +3,5 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-    <!--引入外面资源文件-->
-    <properties resource="dataSource.properties">
-        <property name="username" value="root"/>
-    </properties>
 
-    <typeAliases>
-        <typeAlias type="com.mytatis.dto.CustomerEntity" alias="_customer"/>
-        <package name="com.mytatis.dto"></package>
-    </typeAliases>
- <!--   <settings>
-        <setting name="defaultScriptingLanguage" value="mysql"/>
-    </settings>-->
-    <environments default="development">
-        <environment id="development">
-            <transactionManager type="JDBC"/>
-            <dataSource type="POOLED">
-                <property name="driver" value="${driverclass}"/>
-                <property name="url" value="${url}"/>
-                <property name="username" value="${username}"/>
-                <property name="password" value="${password}"/>
-            </dataSource>
-        </environment>
-    </environments>
-    <mappers>
-        <mapper resource="com/mybatis/mapping/customer-mapping.xml"/>
-        <mapper resource="com/mybatis/mapping/orders-mapping.xml"/>
-        <mapper resource="com/mybatis/mapping/users-mapping.xml"/>
-    </mappers>
 </configuration>

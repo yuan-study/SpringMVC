@@ -1,7 +1,6 @@
-lib/*
-out/*
+web/WEB-INF/lib/*
+web/WEB-INF/classes/*
 logs/*
 .idea/*
 SpringMVC.iml
 test/test.iml
-src/*.properties

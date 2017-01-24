@@ -2,15 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-           http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
-           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+           http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
 
     <!-- 配置数据源 -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
@@ -18,23 +19,52 @@
     </bean>
 
     <!--
-    配置视图层
+    让JdbcTemplate 可以通过@Autowired 注解加到 dao的实现类中
     -->
-    <bean class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
-        <property name="basenames">
-            <list>
-                <value>view</value>
-            </list>
-        </property>
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.core.JdbcTemplate"
+          abstract="false"
+          lazy-init="false" autowire="default">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <context:annotation-config />
-    <!--扫包-->
-    <context:component-scan base-package="com.yuan"/>
+
+    <!--
+        整合Mybatis 到Spring中
+    -->
+
+    <!--<mybatis:scan base-package="com.yuan.dao"/>-->
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+    <!--
+    配置视图层
+    -->
+    <!-- <bean class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+         <property name="basenames">
+             <list>
+                 <value>view</value>
+             </list>
+         </property>
+         <property name="defaultParentView" value="login"/>
+     </bean>-->
+
+    <!--上面的做法很麻烦，于是就有了下面这个类-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
 
     <!--
     配制SpringMVC
     -->
+
+    <!--扫包-->
+    <context:component-scan base-package="com.yuan"/>
+
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
@@ -46,5 +76,34 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+
+    <!--文件上传-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+    <!-- 配置事务 -->
+    <!--声明事务管理者-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--
+    这个类是用来加载用AOP注解来写通知的类用的
+    <aop:aspectj-autoproxy />
+    -->
+
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+
+    <!--声明一个通知-->
+    <tx:advice id="interceptor" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--声明切面-->
+    <aop:config>
+        <aop:advisor advice-ref="interceptor" pointcut="execution(* com..*Service*.*(..))"/>
+    </aop:config>
+
 
 </beans>
