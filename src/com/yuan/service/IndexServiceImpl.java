@@ -21,6 +21,5 @@ public class IndexServiceImpl implements IndexService {
         System.err.println("看看有没有问题");
         indexDao.save1();
         indexDao.save2();
-
     }
 }

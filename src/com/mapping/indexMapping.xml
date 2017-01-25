@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Created by Administrator on 2017/1/25. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuan.dao">
+    <insert id="insertBook" parameterType="com.yuan.dto.BookEntity">
+        <![CDATA[
+         INSERT INTO book (id,book_name,price) VALUES (UUID(),#{bookName},#{price})
+        ]]>
+    </insert>
+
+</mapper>

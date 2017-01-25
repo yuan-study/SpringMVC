@@ -19,6 +19,7 @@
     </bean>
 
     <!--
+    将数据源注入到jdbcTemplate中去
     让JdbcTemplate 可以通过@Autowired 注解加到 dao的实现类中
     -->
     <bean id="jdbcTemplate"
@@ -37,8 +38,18 @@
 
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations">
+            <list>
+                <value>
+                    classpath*:com/mapping/**/*Mapping.xml
+                </value>
+            </list>
+        </property>
     </bean>
 
+    <bean id="sessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
 
     <!--
     配置视图层

@@ -19,7 +19,7 @@ public class IndexController {
     @RequestMapping(value = "/gotoindex")
     public String gotoIndex(){
         logger.info("看看logger日志能不能用");
-//        indexService.login();
+        indexService.login();
         System.err.println("hello controller");
         return "login";
     }
