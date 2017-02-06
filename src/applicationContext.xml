@@ -98,11 +98,153 @@
     </bean>
 
     <!--
-    这个类是用来加载用AOP注解来写通知的类用的
-    <aop:aspectj-autoproxy />
-    -->
+            通过一个类将任意一个类做成一个切面。
+            比如：
 
-    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+   <aop:aspectj-autoproxy/>
+
+                <bean id="myadivice" class="com.pingan.pojo.Pojo"></bean>
+                &lt;!&ndash; 声明顶级元素,且自动代理 &ndash;&gt;
+        <aop:config>
+            <aop:pointcut id="personCut" expression="execution(* com.pingan..Person.*(..))"/> &lt;!&ndash;声明一个全局切点&ndash;&gt;
+            &lt;!&ndash; 声明一个切面 &ndash;&gt;
+            <aop:aspect ref="myadivice">
+
+                &lt;!&ndash; 声明前通知 &ndash;&gt;
+                <aop:around method="around" pointcut-ref="personCut"/>
+                <aop:before method="before" pointcut-ref="personCut"></aop:before>
+                <aop:after method="after" pointcut="execution(* com.pingan.dto.Person.say*(..))"/>
+                <aop:after-returning method="after" pointcut-ref="personCut"/>
+                <aop:after-throwing method="after" pointcut-ref="personCut"/>
+
+            </aop:aspect>
+        </aop:config>
+
+        public class Pojo {
+
+        public void before(){
+            System.err.println("方法在执行前运行");
+        }
+        public void after(){
+            System.err.println("方法在执行后运行");
+        }
+
+        public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+            System.err.println("around 之前");
+            Object obj = joinPoint.proceed();
+            System.err.println("around 之后");
+            return obj;
+        }
+
+    }
+
+
+        -->
+    <aop:aspectj-autoproxy/>
+
+
+    <!--
+        支持用在service接口上用注解来实现事务。
+
+        （注意：在使用注解来做事务的时候一定要声明Service的接口，在接口方法上使用 @Transactional(propagation = Propagation.REQUIRED) 来实现）
+            <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <constructor-arg value="yuan"/>
+    </bean>
+
+    <bean id="action" class="com.annotation.biz.Action">
+        <property name="service">
+            <bean class="com.annotation.biz.ServiceImpl">
+                <property name="daoimpl">
+                    <bean class="com.annotation.biz.DaoImpl">
+                        <property name="dataSource" ref="dataSource"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="transtation" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transtation"/>
+
+
+public class Action {
+    private Service service;
+
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
+    }
+
+    public void run(){
+        service.mysave();
+        service.myupdate();
+    }
+}
+
+public interface Service {
+    @Transactional(propagation = Propagation.REQUIRED)
+    void mysave();
+    @Transactional(propagation = Propagation.REQUIRED)
+    void myupdate();
+}
+
+
+
+public class ServiceImpl implements Service {
+    private DaoImpl daoimpl;
+
+    public DaoImpl getDaoimpl() {
+        return daoimpl;
+    }
+
+    public void setDaoimpl(DaoImpl daoimpl) {
+        this.daoimpl = daoimpl;
+    }
+
+    @Override
+    public void mysave() {
+        daoimpl.save1();
+        daoimpl.save2();
+    }
+
+    @Override
+    public void myupdate() {
+        daoimpl.update1();
+        daoimpl.update2();
+    }
+}
+
+
+public class DaoImpl extends JdbcDaoSupport {
+
+    public void save1() {
+        JdbcTemplate jt = this.getJdbcTemplate();
+        jt.execute("insert into yuan VALUES ('java')");
+    }
+    public void save2() {
+        JdbcTemplate jt = this.getJdbcTemplate();
+        jt.execute("insert into yuan VALUES ('javascript)");
+    }
+
+    public void update1() {
+        JdbcTemplate jt = this.getJdbcTemplate();
+        jt.execute("UPDATE yuan SET username = 'abc' WHERE username = 'java'");
+    }
+    public void update2() {
+        JdbcTemplate jt = this.getJdbcTemplate();
+        jt.execute("UPDATE yuan SET username = 'jquery' WHERE username = 'javascript");
+    }
+}
+
+
+    -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!--声明一个通知-->
     <tx:advice id="interceptor" transaction-manager="transactionManager">
