@@ -67,6 +67,8 @@
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/pages/"/>
         <property name="suffix" value=".jsp"/>
+        <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView"/>
+        <property name="order" value="2"/>
     </bean>
 
     <!--
@@ -258,5 +260,23 @@ public class DaoImpl extends JdbcDaoSupport {
         <aop:advisor advice-ref="interceptor" pointcut="execution(* com..*Service*.*(..))"/>
     </aop:config>
 
+    <!-- 加载属性文件 用${属性名} 来获取-->
+    <context:property-placeholder location="classpath*:*.properties"/>
 
+  <!--  <bean id="properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:*.properties</value>
+            </list>
+        </property>
+    </bean>-->
+
+    <!-- 加载属性文件 用#{id['属性名']} 来获取-->
+    <bean id="propertiesConfig" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:valueTest.properties</value>
+            </list>
+        </property>
+    </bean>
 </beans>
